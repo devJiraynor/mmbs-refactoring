@@ -3,9 +3,9 @@ package com.mong.mmbs.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mong.mmbs.dto.ResponseDto;
 import com.mong.mmbs.dto.UserDeleteDto;
 import com.mong.mmbs.dto.UserUpdateDto;
+import com.mong.mmbs.dto.response.ResponseDto;
 import com.mong.mmbs.entity.UserEntity;
 import com.mong.mmbs.repository.UserRepository;
 

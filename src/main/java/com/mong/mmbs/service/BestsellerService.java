@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import com.mong.mmbs.dto.ResponseDto;
+import com.mong.mmbs.dto.response.ResponseDto;
 import com.mong.mmbs.entity.ProductEntity;
 import com.mong.mmbs.repository.ProductRepository;
 

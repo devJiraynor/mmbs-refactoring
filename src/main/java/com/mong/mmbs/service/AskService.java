@@ -10,11 +10,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mong.mmbs.dto.ResponseDto;
-import com.mong.mmbs.dto.AskDeleteDto;
-import com.mong.mmbs.dto.AskDto;
-import com.mong.mmbs.dto.AskUpdateDto;
-import com.mong.mmbs.dto.AskSearchDto;
+import com.mong.mmbs.dto.request.ask.AskPatchRequestDto;
+import com.mong.mmbs.dto.request.ask.AskPostRequestDto;
+import com.mong.mmbs.dto.response.ResponseDto;
+import com.mong.mmbs.dto.response.ask.AskGetListResponseDto;
+import com.mong.mmbs.dto.response.ask.AskPatchResponseDto;
+import com.mong.mmbs.dto.response.ask.AskPostResponseDto;
 import com.mong.mmbs.repository.AskRepository;
 import com.mong.mmbs.entity.AskEntity;
 
@@ -23,74 +24,84 @@ public class AskService {
 
   @Autowired AskRepository askRepository;
 
-  // 로그인 된 회원의 아이디를 askWriter에 입력
-  public ResponseDto<?> getAskList(String userId) {
+  public ResponseDto<AskGetListResponseDto> getList(String userId) {
 
 		List<AskEntity> askList = new ArrayList<AskEntity>();
 
 		try {
+
 			askList = askRepository.findByAskWriter(userId);
-			if (askList == null) return ResponseDto.setFailed("Does not Exist Order");
+
 		} catch(Exception exception){
 			return ResponseDto.setFailed("Database Error");
 		}
-		return ResponseDto.setSuccess("Success", askList);
+
+		AskGetListResponseDto data  = new AskGetListResponseDto(askList);
+		return ResponseDto.setSuccess("Success", data);
+
 	}
 
-	public ResponseDto<?> askWrite(AskDto dto){
+	public ResponseDto<AskPostResponseDto> post(AskPostRequestDto dto){
 
 		AskEntity askEntity = new AskEntity(dto);
+
 		try {
-			System.out.println(askEntity.toString());
+
 			askRepository.save(askEntity);
+
 		} catch (Exception exception) {
 			return ResponseDto.setFailed("Failed");
 		}
-		return ResponseDto.setSuccess("Ask Write Success", askEntity);
+
+		AskPostResponseDto data = new AskPostResponseDto(askEntity);
+		return ResponseDto.setSuccess("Ask Write Success", data);
 
 	}
 
-	public ResponseDto<?> askUpdateList(int askId){
+	public ResponseDto<?> get(int askId){
 		
 		AskEntity ask = null;
 
 		try {
+
 			ask = askRepository.findByAskId(askId);
+
 		} catch (Exception exception) {
 			return ResponseDto.setFailed("Database Error");
 		}
-		return ResponseDto.setSuccess("성공", ask);
+
+		return ResponseDto.setSuccess("Success", ask);
+
 	}
 
-	public ResponseDto<?> askUpdate(AskUpdateDto dto) {
+	public ResponseDto<AskPatchResponseDto> patch(AskPatchRequestDto dto) {
+
 		AskEntity ask = null;
 		int askId = dto.getAskId();
 
 		try {
+
 			ask = askRepository.findByAskId(askId);
 			if (ask == null) ResponseDto.setFailed("Does Not Exist User");
-		} catch (Exception exception) {
-			ResponseDto.setFailed("Failed");
-		}
 
-		ask.setAskUpdate(dto);
-
-		try {
+			ask.patch(dto);
 			askRepository.save(ask);
+
 		} catch (Exception exception) {
-			ResponseDto.setFailed("Failed");
+			ResponseDto.setFailed("Database Error");
 		}
-		return ResponseDto.setSuccess("Success", ask);
+
+		AskPatchResponseDto data = new AskPatchResponseDto(ask);
+		return ResponseDto.setSuccess("Success", data);
+
 	}
 	
-	public ResponseDto<?> askDelete (AskDeleteDto dto, String userId){
+	public ResponseDto<?> delete (String userId, int askId){
 		
-		int askId =dto.getAskId();
 		try {
 			AskEntity askEntity = askRepository.findByAskId(askId);
 			askRepository.delete(askEntity);
 		} catch (Exception exception) {
-
 			ResponseDto.setFailed("Failed");
 		}
 		
@@ -104,19 +115,13 @@ public class AskService {
 		return ResponseDto.setSuccess("Success", list);
 	}
 
-	public ResponseDto<?> askSearch (AskSearchDto dto, String userId) {
-
-		String askStatus = dto.getAskStatus();
-		int months = dto.getAskDatetime();
-		String askSort = dto.getAskSort();
+	public ResponseDto<?> find(String userId, String askStatus, int months, String askSort) {
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = Date.from(Instant.now().minus(months * 30, ChronoUnit.DAYS));
 		String askDateTime = simpleDateFormat.format(date);
 
 		List<AskEntity> askList = new ArrayList<AskEntity>();
-
-		System.out.println(askDateTime);
 
 		try {
 			askList = askRepository.findByAskWriterAndAskDatetimeGreaterThanEqualAndAskSortContainsAndAskStatusContainsOrderByAskDatetimeDesc(userId, askDateTime, askSort, askStatus);
@@ -125,6 +130,7 @@ public class AskService {
 			exception.printStackTrace();
 			return ResponseDto.setFailed("Database Error");
 		}
+
 		return ResponseDto.setSuccess("Success", askList);
 	
 	}

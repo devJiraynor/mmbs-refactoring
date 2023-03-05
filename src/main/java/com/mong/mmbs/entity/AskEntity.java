@@ -10,8 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
-import com.mong.mmbs.dto.AskDto;
-import com.mong.mmbs.dto.AskUpdateDto;
+import com.mong.mmbs.dto.request.ask.AskPatchRequestDto;
+import com.mong.mmbs.dto.request.ask.AskPostRequestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,20 +48,20 @@ public class AskEntity {
 //  문의 답변
     private String askReply;
 
-		public AskEntity(AskDto dto){
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	public AskEntity(AskPostRequestDto dto){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-			askWriter = dto.getAskWriter();
-			askSort = dto.getAskSort();
-			askTitle = dto.getAskTitle();
-			askContent = dto.getAskContent();
-			askDatetime = dateFormat.format(new Date());
-			askStatus = "문의 접수";
-		}
+		this.askWriter = dto.getAskWriter();
+		this.askSort = dto.getAskSort();
+		this.askTitle = dto.getAskTitle();
+		this.askContent = dto.getAskContent();
+		this.askDatetime = dateFormat.format(new Date());
+		this.askStatus = "문의 접수";
+	}
 
-		public void setAskUpdate(AskUpdateDto dto) {
-			this.askSort = dto.getAskSort();
-			this.askTitle = dto.getAskTitle();
-			this.askContent = dto.getAskContent();
-		}
+	public void patch(AskPatchRequestDto dto) {
+		this.askSort = dto.getAskSort();
+		this.askTitle = dto.getAskTitle();
+		this.askContent = dto.getAskContent();
+	}
 }

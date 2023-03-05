@@ -1,4 +1,4 @@
-package com.mong.mmbs.dto;
+package com.mong.mmbs.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

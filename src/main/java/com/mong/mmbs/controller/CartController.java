@@ -11,7 +11,7 @@ import com.mong.mmbs.dto.AmountUpdateDto;
 import com.mong.mmbs.dto.DeleteAllFromCartDto;
 import com.mong.mmbs.dto.DeleteFromCartDto;
 import com.mong.mmbs.dto.PutInCartDto;
-import com.mong.mmbs.dto.ResponseDto;
+import com.mong.mmbs.dto.response.ResponseDto;
 import com.mong.mmbs.service.CartService;
 
 @RestController
@@ -22,7 +22,6 @@ public class CartController {
 	CartService cartService;
 	@PostMapping("/cartInsert")//상세 페이지에서 장바구니로 담는거
 	public ResponseDto<?> putInCart(@RequestBody PutInCartDto requestBody){
-		System.out.println(requestBody.toString());
 		ResponseDto<?> result = cartService.putInCart(requestBody);
 		return result;
 	}

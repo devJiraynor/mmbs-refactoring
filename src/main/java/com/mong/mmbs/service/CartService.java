@@ -10,11 +10,12 @@ import com.mong.mmbs.dto.AmountUpdateDto;
 import com.mong.mmbs.dto.DeleteAllFromCartDto;
 import com.mong.mmbs.dto.DeleteFromCartDto;
 import com.mong.mmbs.dto.PutInCartDto;
-import com.mong.mmbs.dto.ResponseDto;
+import com.mong.mmbs.dto.response.ResponseDto;
 import com.mong.mmbs.entity.CartEntity;
 import com.mong.mmbs.entity.ProductEntity;
 import com.mong.mmbs.repository.CartRepository;
 import com.mong.mmbs.repository.ProductRepository;
+import com.mong.mmbs.util.ResponseMessage;
 
 @Service
 public class CartService {
@@ -27,7 +28,7 @@ public class CartService {
 		List<CartEntity> cartEntity = cartRepository.findByCartUserId(userId);
 		if (cartEntity == null)
 			return ResponseDto.setFailed("장바구니에 담긴 상품이 없습니다.");
-		return ResponseDto.setSuccess("성공", cartEntity);
+		return ResponseDto.setSuccess(ResponseMessage.SUCCESS, cartEntity);
 	}
 
 	// 장바구니 담기
@@ -38,51 +39,36 @@ public class CartService {
 		int cartProductAmount = dto.getCartProductAmount();
 
 		ProductEntity productEntity = null;
-		try {
-			// 이부분 이해가 필요
-			// productEntity/productRepository안에 cartproductId가 없는데 어떻게 넣는건지
-			productEntity = productRepository.findByProductSeq(cartProductId);
-			if (productEntity == null) {
-				return ResponseDto.setFailed("실패");
-			}
-
-		} catch (Exception exception) {
-			return ResponseDto.setFailed("데이터베이스 오류");
-		}
-
 		CartEntity cartEntity = null;
-		try {
-			// cartUserId, cartProductAmount이 두개만 엔터티에 넣는이유? 
-			// 애초에 cart table db값에 안들어가있는상태가 아닌가??
-			cartEntity = cartRepository.findByCartUserIdAndCartProductId(cartUserId, cartProductId);
-		} catch (Exception exception) {
-			return ResponseDto.setFailed("에러");
-		}
-		if (cartEntity == null) {
-
-			cartEntity = new CartEntity(cartUserId, cartProductAmount, productEntity);
-
-			try {
-				cartRepository.save(cartEntity);
-			} catch (Exception exception) {
-				return ResponseDto.setFailed("error");
-			}
-
-		} else {
-			cartEntity.setCartProductAmount(cartProductAmount);
-			try {
-				cartRepository.save(cartEntity);
-			} catch (Exception exception) {
-				return ResponseDto.setFailed("실패");
-			}
-
-		}
 		
 		List<CartEntity> cartList = new ArrayList<CartEntity>();
+
 		try {
+
+			productEntity = productRepository.findByProductSeq(cartProductId);
+			if (productEntity == null) return ResponseDto.setFailed("실패");
+
+			cartEntity = cartRepository.findByCartUserIdAndCartProductId(cartUserId, cartProductId);
+
+			// 해당 회원의 장바구니 레코드가 존재하지 않을 때
+			if (cartEntity == null) {
+				
+				cartEntity = new CartEntity(cartUserId, cartProductAmount, productEntity);
+				cartRepository.save(cartEntity);
+	
+			} 
+			// 해당 회원의 장바구니 레코드가 존재할 때
+			else {
+
+				cartEntity.setCartProductAmount(cartProductAmount);
+				cartRepository.save(cartEntity);
+
+			}
+
 			cartList = cartRepository.findByCartUserId(cartUserId);
+
 		} catch (Exception exception) {
-			return ResponseDto.setFailed("에러");
+			return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
 		}
 
 		return ResponseDto.setSuccess("성공", cartList);

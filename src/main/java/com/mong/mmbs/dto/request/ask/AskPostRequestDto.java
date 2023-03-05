@@ -1,4 +1,4 @@
-package com.mong.mmbs.dto;
+package com.mong.mmbs.dto.request.ask;
 
 import javax.validation.constraints.NotBlank;
 
@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AskUpdateDto {
+public class AskPostRequestDto {
   @NotBlank
-  private int askId;
-  @NotBlank
-  private String askWriter;
+	private String askWriter;
   @NotBlank
   private String askSort;
   @NotBlank

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import com.mong.mmbs.dto.FindIdDto;
 import com.mong.mmbs.dto.FindPasswordDto;
 import com.mong.mmbs.dto.ResetPasswordDto;
-import com.mong.mmbs.dto.ResponseDto;
 import com.mong.mmbs.dto.SignInDto;
 import com.mong.mmbs.dto.SignInResponseDto;
 import com.mong.mmbs.dto.SignUpDto;
+import com.mong.mmbs.dto.response.ResponseDto;
 import com.mong.mmbs.entity.RecommendEntity;
 import com.mong.mmbs.entity.UserEntity;
 import com.mong.mmbs.repository.RecommendRepository;
@@ -46,7 +46,7 @@ public class AuthService {
     	String userEmail = dto.getUserEmail();
     	
     	UserEntity userEntity = userRepository.findByUserIdAndUserNameAndUserEmail(userId, userName, userEmail);
-    	if(userEntity == null) return ResponseDto.setFailed(" ㅋㅋ일치하는 정보가 없음");
+    	if(userEntity == null) return ResponseDto.setFailed(" 일치하는 정보가 없음");
     	return ResponseDto.setSuccess("성공",null);
     }
     
